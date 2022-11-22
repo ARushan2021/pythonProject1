@@ -5,7 +5,6 @@ from selenium.webdriver.common.keys import Keys
 import requests
 from datetime import date
 
-
 class USDEUROGoogle(unittest.TestCase):
     def setUp(self):
         self.drv = webdriver.Chrome('chromedriver.exe')
@@ -14,7 +13,6 @@ class USDEUROGoogle(unittest.TestCase):
         # 1.Открытие страницы http://google.ru/
         self.drv.get('http://google.ru/')
         assert 'Google' in self.drv.title
-
         # 2.Поиск курса USD ЦБ на гугл.ру
         USDEUROCB = self.drv.find_element(By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input')
         USDEUROCB.send_keys('Курс USD ЦБ')
@@ -26,7 +24,6 @@ class USDEUROGoogle(unittest.TestCase):
         print(GoogleUSD)
         print('Курс Евро на сайте Гуугл:')
         print(GoogleEURO)
-
         # 3.SOAP запрос на сайт ЦБ курсы валют, вытаскиваем курс Доллара и Евро
         dt = str(date.today()).split('-')
         CBRURL = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req=' + dt[2] + '/' + dt[1] + '/' + dt[0]
