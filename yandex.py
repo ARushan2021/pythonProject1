@@ -16,7 +16,6 @@ class Seach_selenide(unittest.TestCase):
         self.drv.get('https://yandex.ru/search/?lr=213&text=USD+MOEX&wiz=finance')
         assert 'Яндекс' in self.drv.title
         time.sleep(1)
-
         # 2.Поиск на яндексе курса USD ЦБ
         USDCB1 = self.drv.find_element(By.XPATH, '//*[@id="a11y-search-result-converter"]/div[2]/div[2]/span[2]/button')
         time.sleep(1)
@@ -40,11 +39,9 @@ class Seach_selenide(unittest.TestCase):
         time.sleep(1)
         YaEURO = self.drv.find_element(By.XPATH, '//*[@id="a11y-search-result-converter"]/div[1]/div[2]/span[1]/input').get_attribute("value")
         YaEURO = float(YaEURO.replace(',', '.'))
-
         # 3.дата из яндекса
         DtYa = self.drv.find_element(By.XPATH, '// *[ @ id = "a11y-search-result-converter"] / div[2] / div[2] / a').text
         dt = str(DtYa[0:10]).split('.')
-
         # 4.SOAP запрос на сайт ЦБ курсы валют, вытаскиваем курс Доллара и Евро, дату в запрос вставялем из яндекса
         CBRURL = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req=' + dt[0] + '/' + dt[1] + '/' + dt[2]
         response = requests.request("POST", CBRURL)
