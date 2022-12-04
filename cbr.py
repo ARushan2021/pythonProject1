@@ -1,41 +1,28 @@
 import requests
-from lxml import etree
 from datetime import date
+import xml.etree.ElementTree as ET
 
 def USDCBR ():
 
         # текущую дату подставляю в url ЦБ
         dt = str(date.today()).split('-')
         CBRURL = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req=' + dt[2] + '/' + dt[1] + '/' + dt[0]
-
         # POST request
         response = requests.request("POST", CBRURL)
-        print(response.text)
-        print(response.content)
-        resp_xml_content = response.content
-        tree = etree.XML(resp_xml_content)
+        resp_xml_content = str(response.content) # ответ из byte в str
+        resp_xml_content = resp_xml_content[2:-1] # из str отрезаем первые два и один послендий элемент
+        resp_xml_content = ET.fromstring(resp_xml_content) # конвертирую str в xml
+        xmlUSD = resp_xml_content[10][4].text # тэг - 11, атрибут - 5 (отсчет от нуля идет)
+        xmlEURO = resp_xml_content[11][4].text
+        xmlUSD = float(xmlUSD.replace(',', '.'))
+        xmlEURO = float(xmlEURO.replace(',', '.'))
+        print(type(xmlEURO))
+        print(xmlEURO)
+        print(type(xmlUSD))
+        print(xmlUSD)
 
-        usd = tree.find()
-        print(usd)
+        #for x in resp_xml_content[10]:
+        #        print(x.tag, x.text)
 
-
-
-        #user_by_email = tree.xpath(f'/response/Valute ID="R01235"/[name = "USD" and value = "{USD}"]')
-        #usd = etree.SubElement('ValCurs', 'Valute', 'Value')
-        #print(usd)
-
-        # Из ответа запроса вытаскиваем курс Доллара ЦБ и округляем до сотых
-        #exchangeUSDCBR = round(float(response.text[1722:1729].replace(',', '.')), 2)
-       #exchangeUSDCBR = str(exchangeUSDCBR)
-
-        # Из ответа запроса вытаскиваем курс Евро ЦБ и округляем до сотых
-        #exchangeEuroCBR = round(float(response.text[1856:1863].replace(',', '.')), 2)
-        #exchangeEuroCBR = str(exchangeEuroCBR)
-
-        #return exchangeEuroCBR, exchangeUSDCBR
-
-#a = USDCBR()
-#print(a[0])
-#print(a[1])
 
 USDCBR ()
