@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 import requests
+import xml.etree.ElementTree as ET
 
 class Seach_selenide(unittest.TestCase):
     def setUp(self):
@@ -45,11 +46,16 @@ class Seach_selenide(unittest.TestCase):
         # 4.SOAP запрос на сайт ЦБ курсы валют, вытаскиваем курс Доллара и Евро, дату в запрос вставялем из яндекса
         CBRURL = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req=' + dt[0] + '/' + dt[1] + '/' + dt[2]
         response = requests.request("POST", CBRURL)
-        exchangeUSDCBR = round(float(response.text[1722:1729].replace(',', '.')), 2)
-        exchangeEuroCBR = round(float(response.text[1856:1863].replace(',', '.')), 2)
+        resp_xml_content = str(response.content)  # ответ из byte в str
+        resp_xml_content = resp_xml_content[2:-1]  # из str отрезаем первые два и один послендий элемент
+        resp_xml_content = ET.fromstring(resp_xml_content)  # конвертирую str в xml
+        xmlUSD = resp_xml_content[10][4].text  # тэг - 11, атрибут - 5 (отсчет от нуля идет)
+        xmlEURO = resp_xml_content[11][4].text
+        xmlUSD = float(xmlUSD.replace(',', '.')) # конфертируем str во float
+        xmlEURO = float(xmlEURO.replace(',', '.'))
 
-        assert YaUSD == exchangeUSDCBR
-        assert YaEURO == exchangeEuroCBR
+        assert YaUSD == round(xmlUSD, 2) # float округляем до сотых
+        assert YaEURO == round(xmlEURO, 2)
 
     def tearDown(self):
         self.drv.close()
